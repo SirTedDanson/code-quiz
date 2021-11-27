@@ -1,127 +1,104 @@
-var questionIdCounter = 0;
 
-var qBody = document.querySelector("#quiz");
-var qQuestion = document.querySelector("#quiz-heading")
+var qBody = document.querySelector(".container");
+var qQuestion = document.getElementById("question");
+var qHeading = document.getElementById("quiz-heading")
+var startQuizButton = document.getElementById("start-quiz");
+var questionContainer = document.getElementById("question-container")
+var answerContainer = document.getElementById("possible-answers")
+var quizHeading = document.getElementById("quiz-heading")
+var promptText = document.getElementById("prompt-text")
+var answerAlert = document.getElementById("answer-alert")
 
-var gameInstructions = document.createElement("div");
-  gameInstructions.id = "introduction";
-  gameInstructions.className = "intro-text";
-  gameInstructions.innerHTML = "<p> Try to answer the folloowing code-related questions within the time limit. Keep in mind that incorrect answers will penelize your score/time by 10 seconds </p>";
-  qBody.appendChild(gameInstructions);
+let randomQuestions, currentQuestion
 
-var answerList = document.createElement("ol");
-  answerList.id = "form-quiz"
-  answerList.className = "quiz"
-  qBody.appendChild(answerList)
-
-var startButton = document.createElement("li");
-  startButton.className = "form-button";
-  startButton.innerHTML = "<button class='start-btn' id='start-quiz' type='submit' value='submit'>Start Quiz</button>"
-  answerList.append(startButton);
-  document.getElementById("start-quiz").style.justifyContent = "center"
-
+  //quiz start button
 var startQuiz = function (event) {
   event.preventDefault();
   console.log("Quiz Start!");
   
-  //get rid of start buttton 
-  gameInstructions.remove();
-  startButton.remove();
+  //make changes to dom for quiz display
+  startQuizButton.remove();
+  questionContainer.classList.remove('hide')
+  promptText.classList.add('hide')
+  quizHeading.classList.add('hide')
 
-  //summon prompt
-  quizPrompt ();
+  // shuffle questions
+  randomQuestions = questions.sort(() => Math.random() - .5);
+  currentQuestion = 0;
+
+  //ask question
+  
+  askQuestion ();
 }
 
-var quizPrompt = function () {
+function clearQuiz () {
   
-  document.getElementById("quiz").style.justifyContent = "left";
-  document.getElementById("quiz-heading").style.textAlign = "left";
-  
-  
-  //create question
-  qQuestion.textContent = "What does HTML stand for?";
-  qQuestion.id = "1";
+  while (answerContainer.firstChild) {
+    answerContainer.removeChild(answerContainer.firstChild)
+  }
+  return;
+}
 
-  //create choices
-  //choice one
-  var answerOne = document.createElement("li");
-  answerOne.id = "possible-answer";
-  answerOne.className = "form-button";
-  answerOne.innerHTML = "<button class='btn' id='1' type='submit' value='submit'>1. Hyper Text Markup Language</button>"
-  answerOne.setAttribute("data-task-id", questionIdCounter);
-  answerList.appendChild(answerOne);
+function askQuestion () {
+  clearQuiz ()
+  showQuestion(randomQuestions[currentQuestion])
+}
 
-  //choice Two
-  var answerTwo = document.createElement("li");
-  answerTwo.id = "possible-answer";
-  answerTwo.className = "form-button";
-  answerTwo.innerHTML = "<button class='btn' id='2' type='submit' value='submit'>2. Home Tool Markup Language</button>"
-  answerTwo.setAttribute("data-task-id", questionIdCounter);
-  answerList.appendChild(answerTwo);
+function showQuestion (question) {
+  qQuestion.innerText = question.question;
+  question.answers.forEach(answer => {
+    var answerButton = document.createElement("button")
+    answerButton.innerText = answer.text
+    answerButton.classList.add("btn")
+    if(answer.correct) {
+      answerButton.dataset.correct = answer.correct
+    }
 
-  //choice three
-  var answerThree = document.createElement("li");
-  answerThree.id = "possible-answer";
-  answerThree.className = "form-button";
-  answerThree.innerHTML = "<button class='btn' id='3' type='submit' value='submit'>3. Hyperlinks and Text Markup Langauge</button>"
-  answerThree.setAttribute("data-task-id", questionIdCounter);
-  answerList.appendChild(answerThree);
-  
-  //choice four
-  var answerFour = document.createElement("li");
-  answerFour.id = "possible-answer";
-  answerFour.className = "form-button";
-  answerFour.innerHTML = "<button class='btn' id='4' type='submit' value='submit'>4. Hyper Text Market Language</button>"
-  answerFour.setAttribute("data-task-id", questionIdCounter);
-  answerList.appendChild(answerFour);
+    answerContainer.appendChild(answerButton)
+    answerButton.addEventListener("click", answerFunction)
+  })
 
-  answerOne.addEventListener("click", answerFunction);
-  answerTwo.addEventListener("click", answerFunction);
-  answerThree.addEventListener("click", answerFunction);
-  answerFour.addEventListener("click", answerFunction);
 }
 
 var answerFunction = function (event) {
-  
-  var correctAnswer = qQuestion.id;
-  var userAnswer = event.target.id;
-  console.log(correctAnswer);
-  console.log("Answer was chosen");
-  console.log(userAnswer);
-  
+
+  //get answer
+  var correctAnswer = "true";
+  var userAnswer = event.target.dataset.correct;
 
   if (correctAnswer == userAnswer) {
-    var answerAlert = document.createElement("div");
-      answerAlert.className = "answer-alert";
       answerAlert.innerHTML = "<h3 class='task-name'>Correct!</h3>";
       qBody.appendChild(answerAlert);
   } else {
-    var answerAlert = document.createElement("div");
-      answerAlert.className = "answer-alert";
       answerAlert.innerHTML = "<h3 class='task-name'>Wrong!</h3>";
       qBody.appendChild(answerAlert);
   }
-  submitScore();
-
-  //while questions exist 
-  //ask another question
-  //else
-  //enter initials
-  //high score screen
+  currentQuestion++;
+  //if questions remain ask question
+  if (currentQuestion < questions.length) {
+  askQuestion();
+  //else go to highscore screen
+  } else {
+  submitScore()
+  }
 }
 
 var submitScore = function (){
 
-  qQuestion.textContent = "All done!";
+   // remove elements
+  clearQuiz();
+  answerAlert.remove();
+  qQuestion.remove();
+
+
+  quizHeading.classList.remove('hide')
+  quizHeading.innerText = "All done!"
+  promptText.classList.remove('hide')
+  promptText.innerHTML = "Your final score is:";
+  promptText.style.textAlign = "left";
+  qBody.style.justifyContent = "left";
   
-  // remove elements
-  var answerAlertBox = document.querySelector(".answer-alert");
-  answerList.remove();
-  answerAlertBox.remove();
-  
-  gameInstructions.innerHTML = "<p> Your final score is </p>";
-  gameInstructions.style.textAlign = "left";
-  qBody.appendChild(gameInstructions);
+  qBody.appendChild(promptText);
 
   var userInitialsForm = document.createElement ("form");
     userInitialsForm.id = "user-initials-form";
@@ -131,9 +108,75 @@ var submitScore = function (){
 
   var userSubmit = document.createElement ("div")
     userSubmit.className = "button-container"
-    userSubmit.innerHTML = "<button class='submit-btn' id='submit-score' type='submit' value='submit'>Submit</button>"
+    userSubmit.innerHTML = "<button class='submit-btn' id='submit-score'>Submit</button>"
     userInitialsForm.appendChild(userSubmit);
+    submitButton = document.getElementById("submit-score")
 
+  submitButton.addEventListener("click", highScoreScreen)
+}
+
+var highScoreScreen = function (event) {
+  event.preventDefault();
+  //remove submission form elements
+  promptText.classList.add('hide')
+  var submitForm = document.getElementById("user-initials-form")
+  submitForm.remove();
+  
+  //add highscore screen elements
+  quizHeading.innerText = "High scores"
+
+  var goBackButton = document.createElement ("button")
+  goBackButton.innerText = "Go back"
+  goBackButton.classList.add("hs-btn")
+  qBody.appendChild(goBackButton);
+
+  var clearHighScores = document.createElement ("button")
+  clearHighScores.innerText = "Clear high scores"
+  clearHighScores.classList.add("hs-btn")
+  qBody.appendChild(clearHighScores);
+
+
+}
+
+
+/* ---------------------QUESTION & ANSWER ARRAYS ------------------------------------*/
+const questions = [
+  {
+    question: "What does HTML stand for?",
+    answers: [
+      { text: '1. Hyper Text Markup Language', correct: true},
+      { text: '2. Home Tool Markup Language', correct: false},
+      { text: '3. Hyperlinks and Text Markup Langauge', correct: false},
+      { text: '4. Hyper Text Market Language', correct: false}
+    ]
+  },
+  {
+    question: "Who is making the Web standards?",
+    answers: [
+      { text: '1. Google', correct: false},
+      { text: '2. Microsoft', correct: false},
+      { text: '3. Mozilla', correct: false},
+      { text: '4. The World Wide Web Consortium', correct: true}
+    ]
+  },
+  {
+    question: "Choose the correct HTML element for the largest heading:",
+    answers: [
+      { text: '1. <h6>', correct: false},
+      { text: '2. <head>', correct: false},
+      { text: '3. <h1>', correct: true},
+      { text: '4. <heading>', correct: false}
+    ]
+  },
+  {
+    question: "Choose the correct HTML element to define important text",
+    answers: [
+      { text: '1. <b>', correct: false},
+      { text: '2. <important>', correct: false},
+      { text: '3. <strong>', correct: true},
+      { text: '4. <i>', correct: false}
+    ]
   }
+]
 
-startButton.addEventListener("click", startQuiz);
+startQuizButton.addEventListener("click", startQuiz);

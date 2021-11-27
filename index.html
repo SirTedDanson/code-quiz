@@ -19,8 +19,19 @@
     </div>
   </header>
   <!-- quiz and start/end -->
-  <main id="quiz">
+  <main class="container">
     <h1 id="quiz-heading">Coding Quiz Challenge</h1>
+    <div id="prompt-text">Try to answer the following code-related questions within the time limit. Keep in mind that incorrect answers will penelize your score/time by 10 seconds </div>
+    <div id="question-container" class="hide">
+      <div id="question">Question</div>
+      <div id="possible-answers" class="answer-buttons">
+       <!-- answers created dynamically -->
+      </div>
+      <div id="answer-alert"></div>
+    </div>
+    <div class="start-button">
+      <button id='start-quiz' class='start-btn'>Start Quiz</button>
+    </div>
   </main>
   <script src="./assets/js/script.js"></script>
 </body>
