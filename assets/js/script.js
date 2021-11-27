@@ -12,6 +12,8 @@ var currentQuestion = 0;
 var randomQuestions = 0;
 var scoreList = [];
 var timeLeft = 25;
+var placeNumber = 1;
+var scoreBonus = 0;
 
 function countdown() {
   //reset timer
@@ -29,10 +31,12 @@ function countdown() {
 }, 1000);
 };
 
+// function to run when countdown hits 0
 function timesUp () {
   
   var onScoreScreen = document.getElementById("clear-score-button")
-  if (onScoreScreen != null) {
+  var onSubmitScreen = document.getElementById("user-initials-form")
+  if (onScoreScreen != null || onSubmitScreen !=null) {
     return;
     
   } else {
@@ -130,6 +134,10 @@ var submitScore = function (){
   clearQuiz();
   answerAlert.remove();
   qQuestion.remove();
+
+  //capture time and stop countdown
+  const quizTime = timeLeft;
+  scoreBonus = (quizTime/2);
   timeLeft = -1;
   qTimer.textContent = "";
 
@@ -139,7 +147,7 @@ var submitScore = function (){
   quizHeading.innerText = "All done!";
   quizHeading.style.textAlign = "left";
 
-  var finalScore = Math.max(0, currentScore);
+  var finalScore = Math.max(0, currentScore) + scoreBonus;
 
   //new prompt text
   promptText.classList.remove('hide');
@@ -167,15 +175,18 @@ var submitScore = function (){
 
 // ----------SAVE SCORE TO LOCAL STORAGE-----------------
 var saveScore = function() {
+  debugger;
   var userInitials = document.querySelector("input[name='user-name'").value;
-  var finalScore = Math.max(0, currentScore);
+  var finalScore = Math.max(0, currentScore) + scoreBonus;
   var userRoundScore = {
     name: userInitials,
     score: finalScore
   }
   scoreList.push(userRoundScore);
-  localStorage.setItem("scoreList", JSON.stringify(scoreList))
+  scoreList.sort(function(a, b){return b.score - a.score});
 
+  localStorage.setItem("scoreList", JSON.stringify(scoreList))
+  console.log(scoreList)
   //load high score sreen
   highScoreScreen ();
 };
@@ -218,18 +229,22 @@ var highScoreScreen = function () {
   quizHeading.innerText = "High scores";
 
   // loop through the saved high score list array 
+  
   for (var i = 0; i < scoreList.length; i++) {
     generateHighScores(scoreList[i]);
+    placeNumber++
   }
 
   // create high score list elements 
   function generateHighScores (recordedScore) {
-
+    
     //highscores list
     var highScoresList = document.createElement("span");
       highScoresList.className = "highscores";
-      highScoresList.innerText = recordedScore.name + " - " + recordedScore.score;
+      highScoresList.innerText = placeNumber + ". " + recordedScore.name + " - " + recordedScore.score;
       qBody.appendChild(highScoresList);
+
+      
   };
 
   //go back button
