@@ -8,7 +8,7 @@ var quizHeading = document.getElementById("quiz-heading");
 var promptText = document.getElementById("prompt-text");
 var answerAlert = document.getElementById("answer-alert");
 var currentScore = 0;
-
+var userScore = [];
 
 let randomQuestions, currentQuestion
 
@@ -30,7 +30,7 @@ var startQuiz = function (event) {
   //ask question
   
   askQuestion ();
-}
+};
 
 function clearQuiz () {
   // removes previous answer buttons
@@ -42,10 +42,10 @@ function clearQuiz () {
 
 function askQuestion () {
   clearQuiz ();
-  showQuestion(randomQuestions[currentQuestion]);
-}
+  nextQuestion (randomQuestions[currentQuestion]);
+};
 
-function showQuestion (question) {
+function nextQuestion (question) {
   qQuestion.innerText = question.question;
   question.answers.forEach(answer => {
     var answerButton = document.createElement("button");
@@ -54,11 +54,10 @@ function showQuestion (question) {
     if(answer.correct) {
       answerButton.dataset.correct = answer.correct;
     }
-
     answerContainer.appendChild(answerButton);
     answerButton.addEventListener("click", answerFunction);
   })
-}
+};
 
 var answerFunction = function (event) {
 
@@ -80,11 +79,11 @@ var answerFunction = function (event) {
   //if questions remain ask question
   if (currentQuestion < questions.length) {
   askQuestion();
-  //else go to highscore screen
+  //else go to submit score screen
   } else {
   submitScore();
   }
-}
+};
 
 var submitScore = function (){
 
@@ -95,11 +94,11 @@ var submitScore = function (){
 
   //format and style the DOM------------------------
   //new quiz heading
-  quizHeading.classList.remove('hide')
+  quizHeading.classList.remove('hide');
   quizHeading.innerText = "All done!";
   quizHeading.style.textAlign = "left";
 
-  var finalScore = Math.max(0, currentScore)
+  var finalScore = Math.max(0, currentScore);
 
   //new prompt text
   promptText.classList.remove('hide');
@@ -119,22 +118,21 @@ var submitScore = function (){
     userSubmit.innerHTML = "<button class='submit-btn' id='submit-score'>Submit</button>";
     userInitialsForm.appendChild(userSubmit);
     submitButton = document.getElementById("submit-score");
-  
-  
-
 
   submitButton.addEventListener("click", highScoreScreen);
-}
+
+  loadHighScores ();
+};
 
 var highScoreScreen = function () {
-  
-   var userInitials = document.querySelector("input[name='user-name'").value;
-   var finalScore = Math.max(0, currentScore)
+    
+  var userInitials = document.querySelector("input[name='user-name'").value;
+  var finalScore = Math.max(0, currentScore);
 
-   var userInfo = {
-     name: userInitials,
-     score: finalScore
-   }
+  var userInfo = {
+    name: userInitials,
+    score: finalScore
+  };
 
   //remove submission form elements
   promptText.classList.add('hide');
@@ -157,7 +155,7 @@ var highScoreScreen = function () {
   goBackButton.classList.add("hs-btn");
   qBody.appendChild(goBackButton);
 
-  //clear highscores button
+  //clear HighScores button
   var clearScoresButton = document.createElement ("button");
   clearScoresButton.innerText = "Clear high scores";
   clearScoresButton.classList.add("hs-btn");
@@ -165,16 +163,56 @@ var highScoreScreen = function () {
 
   //go to home page when "Go back" is pressed
   goBackButton.addEventListener("click", refreshPage);
-  clearScoresButton.addEventListener("click", clearHighScores)
+  clearScoresButton.addEventListener("click", clearHighScores);
 
-  function clearHighScores (){
-    highScoresList.remove();
+};
+
+var loadHighScores = function() {
+  var savedScore = localStorage.getItem("userScore");
+  // if there are no scores, set scoring to an empty array and return out of the function
+  if (!savedScore) {
+    return false;
   }
-}
+  console.log("Saved scores found!");
+  // else, load up saved scores
+
+  // parse into array of objects
+  savedScore = JSON.parse(savedScore);
+
+  // loop through savedScore array
+  for (var i = 0; i < savedScore.length; i++) {
+    // pass each task object into the `generateHighScores()` function
+    generateHighScores(savedScore[i]);
+  }
+};
+
+function generateHighScores (userInfo) {
+
+  //highscores list
+  var highScoresList = document.createElement("span");
+    highScoresList.className = "highscores";
+    highScoresList.innerText = userInfo.name + " - " + userInfo.score;
+    qBody.appendChild(highScoresList);
+
+  userScore.push(userInfo);
+
+  saveScore();
+};
+
+var saveScore = function() {
+  localStorage.setItem("userScore", JSON.stringify(userScore));
+};
+
+function clearHighScores (){
+  var highScores = document.querySelector("highscores");
+  highScores.remove();
+  localStorage.clear();
+  console.log("Scores Cleared!");
+};
 
 function refreshPage() {
   window.location.reload();
-} 
+};
 
 /* ---------------------QUESTION & ANSWER ARRAYS ------------------------------------*/
 const questions = [
