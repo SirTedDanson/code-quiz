@@ -1,5 +1,6 @@
 var qBody = document.querySelector(".container");
 var qQuestion = document.getElementById("question");
+var qTimer = document.getElementById("timer")
 var startQuizButton = document.getElementById("start-quiz");
 var questionContainer = document.getElementById("question-container");
 var answerContainer = document.getElementById("possible-answers");
@@ -10,11 +11,40 @@ var currentScore = 0;
 var currentQuestion = 0;
 var randomQuestions = 0;
 var scoreList = [];
+var timeLeft = 25;
+
+function countdown() {
+  //reset timer
+  timeLeft = 25;
+
+  var timeInterval = setInterval(function() { 
+   if (timeLeft >= 0) {
+    qTimer.textContent = "Time: " + timeLeft;
+    timeLeft--;
+  } else {
+    qTimer.textContent = "";
+    clearInterval(timeInterval);
+    timesUp()
+  }
+}, 1000);
+};
+
+function timesUp () {
+  
+  var onScoreScreen = document.getElementById("clear-score-button")
+  if (onScoreScreen != null) {
+    return;
+    
+  } else {
+    submitScore();
+  }
+}
 
   //quiz start button
 var startQuiz = function (event) {
   event.preventDefault();
   console.log("Quiz Start!");
+  countdown ();
   
   //make changes to dom for quiz display
   startQuizButton.remove();
@@ -78,6 +108,7 @@ var answerFunction = function (event) {
       qBody.appendChild(answerAlert);
   } else {
       currentScore -= 5;
+      timeLeft -= 5;
       answerAlert.innerHTML = "<h3 class='task-name'>Wrong!</h3>";
       qBody.appendChild(answerAlert);
   }
@@ -99,6 +130,8 @@ var submitScore = function (){
   clearQuiz();
   answerAlert.remove();
   qQuestion.remove();
+  timeLeft = -1;
+  qTimer.textContent = "";
 
   //format and style the DOM------------------------
   //new quiz heading
@@ -163,12 +196,12 @@ var loadHighScores = function() {
 };
 
 var highScoreScreen = function () {
-  debugger;
+
+  timeLeft = -1;
+  qTimer.textContent = "";
+
   // disable View High Score Link if already on highscore page
-  var onScoreScreen = document.getElementById("clear-score-button")
-  if (onScoreScreen !=null) {
-    return false;
-  }
+  document.getElementById("high-scores-link").remove();
 
   //remove elements
   clearQuiz();
