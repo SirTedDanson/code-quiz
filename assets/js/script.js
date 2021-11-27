@@ -1,13 +1,14 @@
 
 var qBody = document.querySelector(".container");
 var qQuestion = document.getElementById("question");
-var qHeading = document.getElementById("quiz-heading")
 var startQuizButton = document.getElementById("start-quiz");
-var questionContainer = document.getElementById("question-container")
-var answerContainer = document.getElementById("possible-answers")
-var quizHeading = document.getElementById("quiz-heading")
-var promptText = document.getElementById("prompt-text")
-var answerAlert = document.getElementById("answer-alert")
+var questionContainer = document.getElementById("question-container");
+var answerContainer = document.getElementById("possible-answers");
+var quizHeading = document.getElementById("quiz-heading");
+var promptText = document.getElementById("prompt-text");
+var answerAlert = document.getElementById("answer-alert");
+var currentScore = 0;
+
 
 let randomQuestions, currentQuestion
 
@@ -18,9 +19,9 @@ var startQuiz = function (event) {
   
   //make changes to dom for quiz display
   startQuizButton.remove();
-  questionContainer.classList.remove('hide')
-  promptText.classList.add('hide')
-  quizHeading.classList.add('hide')
+  questionContainer.classList.remove('hide');
+  promptText.classList.add('hide');
+  quizHeading.classList.add('hide');
 
   // shuffle questions
   randomQuestions = questions.sort(() => Math.random() - .5);
@@ -32,32 +33,31 @@ var startQuiz = function (event) {
 }
 
 function clearQuiz () {
-  
+  // removes previous answer buttons
   while (answerContainer.firstChild) {
-    answerContainer.removeChild(answerContainer.firstChild)
+    answerContainer.removeChild(answerContainer.firstChild);
   }
   return;
 }
 
 function askQuestion () {
-  clearQuiz ()
-  showQuestion(randomQuestions[currentQuestion])
+  clearQuiz ();
+  showQuestion(randomQuestions[currentQuestion]);
 }
 
 function showQuestion (question) {
   qQuestion.innerText = question.question;
   question.answers.forEach(answer => {
-    var answerButton = document.createElement("button")
-    answerButton.innerText = answer.text
-    answerButton.classList.add("btn")
+    var answerButton = document.createElement("button");
+    answerButton.innerText = answer.text;
+    answerButton.classList.add("btn");
     if(answer.correct) {
-      answerButton.dataset.correct = answer.correct
+      answerButton.dataset.correct = answer.correct;
     }
 
-    answerContainer.appendChild(answerButton)
-    answerButton.addEventListener("click", answerFunction)
+    answerContainer.appendChild(answerButton);
+    answerButton.addEventListener("click", answerFunction);
   })
-
 }
 
 var answerFunction = function (event) {
@@ -66,20 +66,23 @@ var answerFunction = function (event) {
   var correctAnswer = "true";
   var userAnswer = event.target.dataset.correct;
 
-  if (correctAnswer == userAnswer) {
+  if (userAnswer == correctAnswer) {
+      currentScore += 10;
       answerAlert.innerHTML = "<h3 class='task-name'>Correct!</h3>";
       qBody.appendChild(answerAlert);
   } else {
+      currentScore -= 5;
       answerAlert.innerHTML = "<h3 class='task-name'>Wrong!</h3>";
       qBody.appendChild(answerAlert);
   }
+  
   currentQuestion++;
   //if questions remain ask question
   if (currentQuestion < questions.length) {
   askQuestion();
   //else go to highscore screen
   } else {
-  submitScore()
+  submitScore();
   }
 }
 
@@ -90,11 +93,17 @@ var submitScore = function (){
   answerAlert.remove();
   qQuestion.remove();
 
-
+  //format and style the DOM------------------------
+  //new quiz heading
   quizHeading.classList.remove('hide')
-  quizHeading.innerText = "All done!"
-  promptText.classList.remove('hide')
-  promptText.innerHTML = "Your final score is:";
+  quizHeading.innerText = "All done!";
+  quizHeading.style.textAlign = "left";
+
+  var finalScore = Math.max(0, currentScore)
+
+  //new prompt text
+  promptText.classList.remove('hide');
+  promptText.innerHTML = "Your final score is: " + finalScore;
   promptText.style.textAlign = "left";
   qBody.style.justifyContent = "left";
   
@@ -102,42 +111,70 @@ var submitScore = function (){
 
   var userInitialsForm = document.createElement ("form");
     userInitialsForm.id = "user-initials-form";
-    userInitialsForm.innerHTML = "<p> Enter initials: </p><input type='text' name='user-name' placeholder='Enter Initials' />"
+    userInitialsForm.innerHTML = "<p> Enter initials: </p><input type='text' name='user-name' placeholder='Enter Initials' />";
     qBody.appendChild(userInitialsForm);
+
+  var userSubmit = document.createElement ("div");
+    userSubmit.className = "button-container";
+    userSubmit.innerHTML = "<button class='submit-btn' id='submit-score'>Submit</button>";
+    userInitialsForm.appendChild(userSubmit);
+    submitButton = document.getElementById("submit-score");
+  
   
 
-  var userSubmit = document.createElement ("div")
-    userSubmit.className = "button-container"
-    userSubmit.innerHTML = "<button class='submit-btn' id='submit-score'>Submit</button>"
-    userInitialsForm.appendChild(userSubmit);
-    submitButton = document.getElementById("submit-score")
 
-  submitButton.addEventListener("click", highScoreScreen)
+  submitButton.addEventListener("click", highScoreScreen);
 }
 
-var highScoreScreen = function (event) {
-  event.preventDefault();
+var highScoreScreen = function () {
+  
+   var userInitials = document.querySelector("input[name='user-name'").value;
+   var finalScore = Math.max(0, currentScore)
+
+   var userInfo = {
+     name: userInitials,
+     score: finalScore
+   }
+
   //remove submission form elements
-  promptText.classList.add('hide')
-  var submitForm = document.getElementById("user-initials-form")
+  promptText.classList.add('hide');
+  var submitForm = document.getElementById("user-initials-form");
   submitForm.remove();
   
   //add highscore screen elements
-  quizHeading.innerText = "High scores"
+  quizHeading.innerText = "High scores";
 
-  var goBackButton = document.createElement ("button")
-  goBackButton.innerText = "Go back"
-  goBackButton.classList.add("hs-btn")
+  //highscores list
+  var highScoresList = document.createElement("span");
+    highScoresList.className = "highscores";
+    highScoresList.innerText = userInfo.name + " - " + userInfo.score;
+    qBody.appendChild(highScoresList);
+
+  //go back button
+  var goBackButton = document.createElement ("button");
+  goBackButton.innerText = "Go back";
+  goBackButton.id = "go-back";
+  goBackButton.classList.add("hs-btn");
   qBody.appendChild(goBackButton);
 
-  var clearHighScores = document.createElement ("button")
-  clearHighScores.innerText = "Clear high scores"
-  clearHighScores.classList.add("hs-btn")
-  qBody.appendChild(clearHighScores);
+  //clear highscores button
+  var clearScoresButton = document.createElement ("button");
+  clearScoresButton.innerText = "Clear high scores";
+  clearScoresButton.classList.add("hs-btn");
+  qBody.appendChild(clearScoresButton);
 
+  //go to home page when "Go back" is pressed
+  goBackButton.addEventListener("click", refreshPage);
+  clearScoresButton.addEventListener("click", clearHighScores)
 
+  function clearHighScores (){
+    highScoresList.remove();
+  }
 }
 
+function refreshPage() {
+  window.location.reload();
+} 
 
 /* ---------------------QUESTION & ANSWER ARRAYS ------------------------------------*/
 const questions = [

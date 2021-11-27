@@ -52,6 +52,7 @@ main {
   font-size: 48px;
   margin: 0%;
   flex: 100%;
+  text-align: center;
 }
 
 #prompt-text {
@@ -139,6 +140,13 @@ main form input {
 /* ---- highscore screen */
 .hs-btn {
   margin-right: 10px;
+}
+
+.highscores {
+  flex: 100%;
+  font-size: 30px;
+  background-color: #d9d3e9;
+  padding: 10px;
 }
 
 /* utilitiy class */
