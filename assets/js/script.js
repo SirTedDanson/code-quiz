@@ -1,4 +1,3 @@
-
 var qBody = document.querySelector(".container");
 var qQuestion = document.getElementById("question");
 var startQuizButton = document.getElementById("start-quiz");
@@ -8,9 +7,9 @@ var quizHeading = document.getElementById("quiz-heading");
 var promptText = document.getElementById("prompt-text");
 var answerAlert = document.getElementById("answer-alert");
 var currentScore = 0;
-var userScore = [];
-
-let randomQuestions, currentQuestion
+var currentQuestion = 0;
+var randomQuestions = 0;
+var scoreList = [];
 
   //quiz start button
 var startQuiz = function (event) {
@@ -28,14 +27,21 @@ var startQuiz = function (event) {
   currentQuestion = 0;
 
   //ask question
-  
   askQuestion ();
 };
 
+// Clear previous quiz buttons
 function clearQuiz () {
-  // removes previous answer buttons
   while (answerContainer.firstChild) {
     answerContainer.removeChild(answerContainer.firstChild);
+  }
+  var submitForm = document.getElementById("user-initials-form");
+  if (submitForm !=null) {
+  submitForm.remove();
+  }
+  var startButton = document.getElementById("start-quiz");
+  if (startButton !=null) {
+  startButton.remove();
   }
   return;
 }
@@ -59,6 +65,7 @@ function nextQuestion (question) {
   })
 };
 
+// ---- CHECK IF ANSWER WAS CORRECT -----------------
 var answerFunction = function (event) {
 
   //get answer
@@ -85,6 +92,7 @@ var answerFunction = function (event) {
   }
 };
 
+// -------- LOAD SUBMIT INITIALS AND SCORE SCREEN -----------------------------
 var submitScore = function (){
 
    // remove elements
@@ -105,48 +113,91 @@ var submitScore = function (){
   promptText.innerHTML = "Your final score is: " + finalScore;
   promptText.style.textAlign = "left";
   qBody.style.justifyContent = "left";
-  
   qBody.appendChild(promptText);
-
+  
+  //create user iniital input form
   var userInitialsForm = document.createElement ("form");
     userInitialsForm.id = "user-initials-form";
     userInitialsForm.innerHTML = "<p> Enter initials: </p><input type='text' name='user-name' placeholder='Enter Initials' />";
     qBody.appendChild(userInitialsForm);
 
+  //create user intial & score submit button
   var userSubmit = document.createElement ("div");
     userSubmit.className = "button-container";
     userSubmit.innerHTML = "<button class='submit-btn' id='submit-score'>Submit</button>";
     userInitialsForm.appendChild(userSubmit);
     submitButton = document.getElementById("submit-score");
 
-  submitButton.addEventListener("click", highScoreScreen);
+  // Save score when hitting submit
+  submitButton.addEventListener("click", saveScore);
+};
 
-  loadHighScores ();
+// ----------SAVE SCORE TO LOCAL STORAGE-----------------
+var saveScore = function() {
+  var userInitials = document.querySelector("input[name='user-name'").value;
+  var finalScore = Math.max(0, currentScore);
+  var userRoundScore = {
+    name: userInitials,
+    score: finalScore
+  }
+  scoreList.push(userRoundScore);
+  localStorage.setItem("scoreList", JSON.stringify(scoreList))
+
+  //load high score sreen
+  highScoreScreen ();
+};
+
+var loadHighScores = function() {
+  var savedScore = localStorage.getItem("scoreList");
+  // if there are no scores, set scoring to an empty array
+  if (!savedScore) {
+    return false;
+  }
+  console.log("Saved scores found!");
+
+  // parse into array of objects
+  savedScore = JSON.parse(savedScore);
+  
+  // set the high scores list with the list from storage
+  scoreList = savedScore; 
 };
 
 var highScoreScreen = function () {
-    
-  var userInitials = document.querySelector("input[name='user-name'").value;
-  var finalScore = Math.max(0, currentScore);
+  debugger;
+  // disable View High Score Link if already on highscore page
+  var onScoreScreen = document.getElementById("clear-score-button")
+  if (onScoreScreen !=null) {
+    return false;
+  }
 
-  var userInfo = {
-    name: userInitials,
-    score: finalScore
-  };
-
-  //remove submission form elements
+  //remove elements
+  clearQuiz();
   promptText.classList.add('hide');
-  var submitForm = document.getElementById("user-initials-form");
-  submitForm.remove();
-  
-  //add highscore screen elements
+  qQuestion.classList.add('hide');
+  answerAlert.classList.add('hide');
+
+  // style elements left
+  qBody.style.justifyContent = "left";
+  quizHeading.style.textAlign = "left";
+
+  //add highscore heading
+  quizHeading.classList.remove('hide');
   quizHeading.innerText = "High scores";
 
-  //highscores list
-  var highScoresList = document.createElement("span");
-    highScoresList.className = "highscores";
-    highScoresList.innerText = userInfo.name + " - " + userInfo.score;
-    qBody.appendChild(highScoresList);
+  // loop through the saved high score list array 
+  for (var i = 0; i < scoreList.length; i++) {
+    generateHighScores(scoreList[i]);
+  }
+
+  // create high score list elements 
+  function generateHighScores (recordedScore) {
+
+    //highscores list
+    var highScoresList = document.createElement("span");
+      highScoresList.className = "highscores";
+      highScoresList.innerText = recordedScore.name + " - " + recordedScore.score;
+      qBody.appendChild(highScoresList);
+  };
 
   //go back button
   var goBackButton = document.createElement ("button");
@@ -158,63 +209,43 @@ var highScoreScreen = function () {
   //clear HighScores button
   var clearScoresButton = document.createElement ("button");
   clearScoresButton.innerText = "Clear high scores";
+  clearScoresButton.id = "clear-score-button"
   clearScoresButton.classList.add("hs-btn");
   qBody.appendChild(clearScoresButton);
 
   //go to home page when "Go back" is pressed
   goBackButton.addEventListener("click", refreshPage);
   clearScoresButton.addEventListener("click", clearHighScores);
-
 };
 
-var loadHighScores = function() {
-  var savedScore = localStorage.getItem("userScore");
-  // if there are no scores, set scoring to an empty array and return out of the function
-  if (!savedScore) {
-    return false;
-  }
-  console.log("Saved scores found!");
-  // else, load up saved scores
-
-  // parse into array of objects
-  savedScore = JSON.parse(savedScore);
-
-  // loop through savedScore array
-  for (var i = 0; i < savedScore.length; i++) {
-    // pass each task object into the `generateHighScores()` function
-    generateHighScores(savedScore[i]);
-  }
-};
-
-function generateHighScores (userInfo) {
-
-  //highscores list
-  var highScoresList = document.createElement("span");
-    highScoresList.className = "highscores";
-    highScoresList.innerText = userInfo.name + " - " + userInfo.score;
-    qBody.appendChild(highScoresList);
-
-  userScore.push(userInfo);
-
-  saveScore();
-};
-
-var saveScore = function() {
-  localStorage.setItem("userScore", JSON.stringify(userScore));
-};
-
+// clear high scores function
 function clearHighScores (){
-  var highScores = document.querySelector("highscores");
+  // clear page elements
+  var highScores = document.querySelector(".highscores");
+  if (highScores !=null) {
   highScores.remove();
+  clearHighScores();
+  }
+
+  //clear storage
   localStorage.clear();
   console.log("Scores Cleared!");
 };
 
+// go back to main page by reloading page
 function refreshPage() {
   window.location.reload();
 };
 
-/* ---------------------QUESTION & ANSWER ARRAYS ------------------------------------*/
+//listen for start quiz click and view highscores click
+startQuizButton.addEventListener("click", startQuiz);
+document.getElementById("high-scores-link").onclick = highScoreScreen;
+
+//load the highscores
+loadHighScores ();
+
+/*--------------------------------------------------------------------------------------*/
+/* ------------------------------QUESTION & ANSWER ARRAYS ------------------------------*/
 const questions = [
   {
     question: "What does HTML stand for?",
@@ -253,5 +284,3 @@ const questions = [
     ]
   }
 ]
-
-startQuizButton.addEventListener("click", startQuiz);
