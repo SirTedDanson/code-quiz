@@ -1,6 +1,7 @@
 var qBody = document.querySelector(".container");
 var qQuestion = document.getElementById("question");
-var qTimer = document.getElementById("timer")
+var qTimer = document.getElementById("timer");
+var pageHeader = document.getElementById("quiz-header")
 var startQuizButton = document.getElementById("start-quiz");
 var questionContainer = document.getElementById("question-container");
 var answerContainer = document.getElementById("possible-answers");
@@ -249,6 +250,7 @@ var highScoreScreen = function () {
   // style elements left
   qBody.style.justifyContent = "left";
   quizHeading.style.textAlign = "left";
+  pageHeader.style.marginBottom = "0px"
 
   //add highscore heading
   quizHeading.classList.remove('hide');

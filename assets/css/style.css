@@ -131,7 +131,7 @@ main form p {
 main form input {
   padding: 10px;
   margin-bottom: 40px;
-  width: 50%;
+  width: 40%;
 }
 
 .button-container {
@@ -168,4 +168,27 @@ input:focus {
 /* utilitiy class */
 .hide {
   display: none;
+}
+
+@media screen and (max-width: 768px) {
+  
+  header {
+    margin-bottom: 40px;
+  }
+
+  main {
+    margin: auto 5%;
+  }
+
+  main form {
+    width: 80%;
+    flex-wrap: wrap;
+  }
+
+  .button-container, main form input, main form p  {
+    flex: 100%;
+    margin-left: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
 }
