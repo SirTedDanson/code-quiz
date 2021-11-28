@@ -11,14 +11,14 @@ var currentScore = 0;
 var currentQuestion = 0;
 var randomQuestions = 0;
 var scoreList = [];
-var timeLeft = 25;
+var timeLeft = 45;
 var placeNumber = 1;
 var scoreBonus = 0;
 var finalScore = 0;
 
 function countdown() {
   //reset timer
-  timeLeft = 25;
+  timeLeft = 45;
 
   var timeInterval = setInterval(function() { 
    if (timeLeft >= 0) {
@@ -87,7 +87,12 @@ function askQuestion () {
 };
 
 function nextQuestion (question) {
+  //populate question
   qQuestion.innerText = question.question;
+  //style question prompts
+  qQuestion.style.fontSize = "45px"
+  qBody.style.justifyContent = "left"
+  //populate answers
   question.answers.forEach(answer => {
     var answerButton = document.createElement("button");
     answerButton.innerText = answer.text;
@@ -134,7 +139,7 @@ function captureScore () {
   scoreBonus = (quizTime/2);
   timeLeft = -1;
   qTimer.textContent = "";
-  finalScore = Math.max(0, currentScore) + scoreBonus;
+  finalScore = Math.max(0, (currentScore + scoreBonus));
   submitScore();
 }
 
@@ -195,7 +200,7 @@ function emptyField () {
 // -------------------------------------------------SAVE SCORE TO LOCAL STORAGE-----------------
 var saveScore = function() {
   var userInitials = document.querySelector("input[name='user-name'").value;
-  var finalScore = Math.max(0, currentScore) + scoreBonus;
+  var finalScore = Math.max(0, (currentScore + scoreBonus));
   var userRoundScore = {
     name: userInitials,
     score: finalScore
@@ -315,39 +320,57 @@ loadHighScores ();
 /* ------------------------------QUESTION & ANSWER ARRAYS ------------------------------*/
 const questions = [
   {
-    question: "What does HTML stand for?",
+    question: "In Javascript, what is the font case used when creating objects?",
     answers: [
-      { text: '1. Hyper Text Markup Language', correct: true},
-      { text: '2. Home Tool Markup Language', correct: false},
-      { text: '3. Hyperlinks and Text Markup Langauge', correct: false},
-      { text: '4. Hyper Text Market Language', correct: false}
+      { text: '1. Camel Case', correct: true},
+      { text: '2. Lower Case', correct: false},
+      { text: '3. Java Case', correct: false},
+      { text: '4. Upper Case', correct: false}
     ]
   },
   {
-    question: "Who is making the Web standards?",
+    question: "In Javascript, what does 'this' refer too?",
     answers: [
-      { text: '1. Google', correct: false},
-      { text: '2. Microsoft', correct: false},
-      { text: '3. Mozilla', correct: false},
-      { text: '4. The World Wide Web Consortium', correct: true}
+      { text: '1. The This Function', correct: false},
+      { text: '2. The Current Window', correct: false},
+      { text: '3. The DOM', correct: false},
+      { text: '4. Refers To The Object It Belongs To', correct: true}
     ]
   },
   {
-    question: "Choose the correct HTML element for the largest heading:",
+    question: "What is a callback function",
     answers: [
-      { text: '1. <h6>', correct: false},
-      { text: '2. <head>', correct: false},
-      { text: '3. <h1>', correct: true},
-      { text: '4. <heading>', correct: false}
+      { text: '1. A Function Used With Phone Numbers', correct: false},
+      { text: '2. An Interval Function', correct: false},
+      { text: '3. A Function Passed Into Another Function As An Arguement', correct: true},
+      { text: '4. A Conditional Loop', correct: false}
     ]
   },
   {
-    question: "Choose the correct HTML element to define important text",
+    question: "Which is a method for combining arrays?",
     answers: [
-      { text: '1. <b>', correct: false},
-      { text: '2. <important>', correct: false},
-      { text: '3. <strong>', correct: true},
-      { text: '4. <i>', correct: false}
+      { text: '1. .combine', correct: false},
+      { text: '2. .addarray', correct: false},
+      { text: '3. .concat', correct: true},
+      { text: '4. .merge', correct: false}
+    ]
+  },
+  {
+    question: "What is the 'switch' statement used for?",
+    answers: [
+      { text: '1. Switch Between Style Sheets', correct: false},
+      { text: '2. Perform Different Actions Based on Different Conditions', correct: true},
+      { text: '3. Alternate Between Jquery and Java', correct: false},
+      { text: '4. Switch Between MAC and PC settings', correct: false}
+    ]
+  },
+  {
+    question: "What is primitave data",
+    answers: [
+      { text: '1. The HTML', correct: false},
+      { text: '2. Data Which Is Easily Stored', correct: false},
+      { text: '3. Single Data Value With No Additional Properities', correct: true},
+      { text: '4. Data No Longer In Use', correct: false}
     ]
   }
-]
+];
