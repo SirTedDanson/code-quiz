@@ -14,6 +14,7 @@ var scoreList = [];
 var timeLeft = 25;
 var placeNumber = 1;
 var scoreBonus = 0;
+var finalScore = 0;
 
 function countdown() {
   //reset timer
@@ -64,7 +65,7 @@ var startQuiz = function (event) {
   askQuestion ();
 };
 
-// Clear previous quiz buttons
+// Clear previous quiz buttons---------------------------
 function clearQuiz () {
   while (answerContainer.firstChild) {
     answerContainer.removeChild(answerContainer.firstChild);
@@ -99,7 +100,7 @@ function nextQuestion (question) {
   })
 };
 
-// ---- CHECK IF ANSWER WAS CORRECT -----------------
+// ------------------------------------------ CHECK IF ANSWER WAS CORRECT -----------------
 var answerFunction = function (event) {
 
   //get answer
@@ -123,11 +124,22 @@ var answerFunction = function (event) {
   askQuestion();
   //else go to submit score screen
   } else {
-  submitScore();
+  captureScore ()
   }
-};
+}
 
-// -------- LOAD SUBMIT INITIALS AND SCORE SCREEN -----------------------------
+//capture game score and disable timer
+function captureScore () {
+  const quizTime = timeLeft;
+  scoreBonus = (quizTime/2);
+  timeLeft = -1;
+  qTimer.textContent = "";
+  finalScore = Math.max(0, currentScore) + scoreBonus;
+  submitScore();
+}
+
+
+// ------------------------------ LOAD SUBMIT INITIALS AND SCORE SCREEN -----------------------------
 var submitScore = function (){
 
    // remove elements
@@ -135,23 +147,19 @@ var submitScore = function (){
   answerAlert.remove();
   qQuestion.remove();
 
-  //capture time and stop countdown
-  const quizTime = timeLeft;
-  scoreBonus = (quizTime/2);
-  timeLeft = -1;
-  qTimer.textContent = "";
-
   //format and style the DOM------------------------
   //new quiz heading
   quizHeading.classList.remove('hide');
   quizHeading.innerText = "All done!";
   quizHeading.style.textAlign = "left";
-
-  var finalScore = Math.max(0, currentScore) + scoreBonus;
+  
 
   //new prompt text
+  var onSubmitScreen = document.getElementById("user-initials-form")
+  //if (onSubmitScreen =null) {
+    promptText.innerHTML = "Your final score is: " + finalScore;
+  //} 
   promptText.classList.remove('hide');
-  promptText.innerHTML = "Your final score is: " + finalScore;
   promptText.style.textAlign = "left";
   qBody.style.justifyContent = "left";
   qBody.appendChild(promptText);
@@ -169,20 +177,33 @@ var submitScore = function (){
     userInitialsForm.appendChild(userSubmit);
     submitButton = document.getElementById("submit-score");
 
+
   // Save score when hitting submit
-  submitButton.addEventListener("click", saveScore);
+  submitButton.addEventListener("click", emptyField);
 };
 
-// ----------SAVE SCORE TO LOCAL STORAGE-----------------
+function emptyField () {
+  var userNameInput = document.querySelector("input[name='user-name'").value;
+  if (userNameInput === "") {
+    alert("You need to fill out the task form!");
+    return submitScore ();
+  }
+  else
+  saveScore ();
+}
+
+// -------------------------------------------------SAVE SCORE TO LOCAL STORAGE-----------------
 var saveScore = function() {
-  debugger;
   var userInitials = document.querySelector("input[name='user-name'").value;
   var finalScore = Math.max(0, currentScore) + scoreBonus;
   var userRoundScore = {
     name: userInitials,
     score: finalScore
   }
+  //add round score to the high score list
   scoreList.push(userRoundScore);
+
+  //sort the high score list 
   scoreList.sort(function(a, b){return b.score - a.score});
 
   localStorage.setItem("scoreList", JSON.stringify(scoreList))
@@ -229,7 +250,7 @@ var highScoreScreen = function () {
   quizHeading.innerText = "High scores";
 
   // loop through the saved high score list array 
-  
+
   for (var i = 0; i < scoreList.length; i++) {
     generateHighScores(scoreList[i]);
     placeNumber++
@@ -243,8 +264,6 @@ var highScoreScreen = function () {
       highScoresList.className = "highscores";
       highScoresList.innerText = placeNumber + ". " + recordedScore.name + " - " + recordedScore.score;
       qBody.appendChild(highScoresList);
-
-      
   };
 
   //go back button
