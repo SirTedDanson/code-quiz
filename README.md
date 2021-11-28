@@ -12,7 +12,7 @@ Timed Javascript coding quiz to test developer knowledge. Scoring based on answe
 https://sirteddanson.github.io/code-quiz/
 
 ## Screenshot
-![](./assets/images/website-snapshot.PNG/)
+![](./assets/images/website-screenshot.PNG/)
 
 ## Contribution
 Made with ❤️ by Matthew Dwyer
