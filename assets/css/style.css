@@ -70,7 +70,7 @@ main {
 }
 
 #question {
-  font-size: 30px;
+  font-size: 45px;
   margin: auto;
   margin-bottom: 0;
   flex: 100%;
@@ -123,13 +123,13 @@ main form {
 }
 
 main form p {
-  padding-right: 20px;
   font-size: 30px;
   margin: 0;
 }
 
 main form input {
   padding: 10px;
+  margin-left: 20px;
   margin-bottom: 40px;
   width: 40%;
 }
@@ -191,4 +191,28 @@ input:focus {
     margin-top: 10px;
     margin-bottom: 10px;
   }
+}
+
+@media screen and (max-width: 576px) {
+
+.header-box {
+  font-size: 20px;
+}
+
+#quiz-heading {
+  font-size: 30px;
+}
+
+#prompt-text {
+  font-size: 25px;
+}
+
+#question {
+  font-size: 30px;
+}
+
+main .start-btn, main .btn, .submit-btn {
+  font-size: 20px;
+  padding: 5px 15px;
+}
 }
